@@ -261,219 +261,502 @@ export function MeetMapApp() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <p>Loading MeetMap…</p>
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-slate-600">Loading MeetMap…</p>
       </div>
     );
   }
 
+  if (!session) {
+    return <AuthPage authMode={authMode} setAuthMode={setAuthMode} authEmail={authEmail} setAuthEmail={setAuthEmail} authPassword={authPassword} setAuthPassword={setAuthPassword} showPassword={showPassword} setShowPassword={setShowPassword} handleAuth={handleAuth} authMessage={authMessage} />;
+  }
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#1e3a8a,_#020617_70%)] px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8">
-        <header className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-2xl shadow-black/30 backdrop-blur md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">MeetMap</p>
-            <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
-              Create local plans and meet people nearby.
-            </h1>
-            <p className="mt-3 max-w-2xl text-base text-slate-300">
-              This MVP starts with the core loop: authenticate, save a plan, and discover it in a simple feed.
-            </p>
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
+              M
+            </div>
+            <h1 className="text-xl font-bold text-slate-900">MeetMap</h1>
           </div>
-          {!session ? (
-            <div className="flex gap-2">
-              <button
-                className={`rounded-full px-4 py-2 text-sm font-medium ${
-                  authMode === "sign-in" ? "bg-cyan-500 text-slate-950" : "bg-slate-800 text-slate-200"
-                }`}
-                onClick={() => setAuthMode("sign-in")}
-                type="button"
-              >
-                Sign in
-              </button>
-              <button
-                className={`rounded-full px-4 py-2 text-sm font-medium ${
-                  authMode === "sign-up" ? "bg-cyan-500 text-slate-950" : "bg-slate-800 text-slate-200"
-                }`}
-                onClick={() => setAuthMode("sign-up")}
-                type="button"
-              >
-                Sign up
-              </button>
-            </div>
-          ) : (
-            <button
-              className="rounded-full border border-white/10 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200"
-              onClick={handleSignOut}
-              type="button"
-            >
-              Sign out
-            </button>
-          )}
-        </header>
+          <button
+            onClick={handleSignOut}
+            type="button"
+            className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            Sign out
+          </button>
+        </div>
+      </header>
 
-        {!session ? (
-          <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/30">
-              <h2 className="text-2xl font-semibold">Start with a simple account</h2>
-              <p className="mt-3 text-slate-300">
-                The first milestone is a working auth flow and a plan creation form connected to your database.
-              </p>
-              <ul className="mt-6 space-y-3 text-sm text-slate-400">
-                <li>• Supabase handles authentication and the plan feed</li>
-                <li>• Google Places powers venue search</li>
-                <li>• The next step is a map view and join requests</li>
-              </ul>
-            </div>
-
-            <form onSubmit={handleAuth} className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/30">
-              <h2 className="text-xl font-semibold">
-                {authMode === "sign-in" ? "Welcome back" : "Create your account"}
-              </h2>
-              <div className="mt-6 space-y-4">
-                <label className="block text-sm text-slate-300">
-                  Email
-                  <input
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-0"
-                    type="email"
-                    value={authEmail}
-                    onChange={(event) => setAuthEmail(event.target.value)}
-                    required
-                  />
-                </label>
-                <label className="block text-sm text-slate-300">
-                  Password
-                  <input
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-0"
-                    type="password"
-                    value={authPassword}
-                    onChange={(event) => setAuthPassword(event.target.value)}
-                    required
-                  />
-                </label>
+      {/* Main content */}
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Create plan form */}
+          <form onSubmit={handleCreatePlan} className="lg:col-span-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-slate-900">Create a plan</h2>
+                <p className="mt-2 text-slate-600">
+                  Share what you're planning and let people join your adventure.
+                </p>
               </div>
-              {authMessage ? <p className="mt-4 text-sm text-cyan-300">{authMessage}</p> : null}
-              <button className="mt-6 w-full rounded-2xl bg-cyan-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400" type="submit">
-                {authMode === "sign-in" ? "Sign in" : "Create account"}
-              </button>
-            </form>
-          </section>
-        ) : (
-          <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <form onSubmit={handleCreatePlan} className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/30">
-              <div className="flex items-center justify-between">
+
+              <div className="space-y-6">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">New plan</p>
-                  <h2 className="mt-2 text-2xl font-semibold">Create a plan in one minute</h2>
-                </div>
-              </div>
-
-              <div className="mt-6 space-y-4">
-                <label className="block text-sm text-slate-300">
-                  Venue search
+                  <label htmlFor="venue" className="block text-sm font-medium text-slate-900">
+                    Venue search
+                  </label>
                   <input
                     ref={venueInputRef}
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-0"
+                    id="venue"
+                    type="text"
+                    className={`mt-2 ${inputClass}`}
                     placeholder="Search for a cafe, park, or venue"
                     value={venueName}
                     onChange={(event) => setVenueName(event.target.value)}
                   />
-                </label>
+                </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="block text-sm text-slate-300">
-                    Activity
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="activity" className="block text-sm font-medium text-slate-900">
+                      Activity
+                    </label>
                     <select
-                      className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-0"
+                      id="activity"
+                      className={`mt-2 ${inputClass}`}
                       value={activityType}
                       onChange={(event) => setActivityType(event.target.value)}
                     >
                       {activityOptions.map((option) => (
                         <option key={option} value={option}>
-                          {option}
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
                         </option>
                       ))}
                     </select>
-                  </label>
+                  </div>
 
-                  <label className="block text-sm text-slate-300">
-                    Spots
+                  <div>
+                    <label htmlFor="spots" className="block text-sm font-medium text-slate-900">
+                      Total spots
+                    </label>
                     <input
-                      className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-0"
+                      id="spots"
+                      type="number"
                       min={1}
                       max={20}
-                      type="number"
+                      className={`mt-2 ${inputClass}`}
                       value={spotsTotal}
                       onChange={(event) => setSpotsTotal(Number(event.target.value))}
                     />
-                  </label>
+                  </div>
                 </div>
 
-                <label className="block text-sm text-slate-300">
-                  Date and time
+                <div>
+                  <label htmlFor="datetime" className="block text-sm font-medium text-slate-900">
+                    Date and time
+                  </label>
                   <input
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-0"
+                    id="datetime"
                     type="datetime-local"
+                    className={`mt-2 ${inputClass}`}
                     value={scheduledAt}
                     onChange={(event) => setScheduledAt(event.target.value)}
                     required
                   />
-                </label>
+                </div>
 
-                <label className="block text-sm text-slate-300">
-                  Notes
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-slate-900">
+                    Description
+                  </label>
                   <textarea
-                    className="mt-2 min-h-24 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-0"
+                    id="description"
+                    className={`mt-2 min-h-28 resize-none ${inputClass}`}
+                    placeholder="Tell people what you're planning..."
                     value={description}
                     onChange={(event) => setDescription(event.target.value)}
-                    placeholder="Tell people what you're planning"
                   />
-                </label>
-              </div>
-
-              {formMessage ? <p className="mt-4 text-sm text-cyan-300">{formMessage}</p> : null}
-              <button className="mt-6 w-full rounded-2xl bg-cyan-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400" type="submit" disabled={submitting}>
-                {submitting ? "Creating..." : "Create plan"}
-              </button>
-            </form>
-
-            <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Plans feed</p>
-                  <h2 className="mt-2 text-2xl font-semibold">Latest nearby plans</h2>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-3">
+              {formMessage && (
+                <div className={`mt-6 rounded-lg p-4 text-sm ${
+                  formMessage.includes("error") || formMessage.includes("Error")
+                    ? "bg-red-50 text-red-700"
+                    : "bg-green-50 text-green-700"
+                }`}>
+                  {formMessage}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-8 w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+              >
+                {submitting ? "Creating..." : "Create plan"}
+              </button>
+            </div>
+          </form>
+
+          {/* Plans feed */}
+          <div className="lg:col-span-1">
+            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900">Plans feed</h2>
+              <p className="mt-1 text-sm text-slate-600">Latest plans in your area</p>
+
+              <div className="mt-6 space-y-4">
                 {plans.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">
-                    No plans yet. Your first one will appear here.
+                  <div className="rounded-lg border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">
+                    No plans yet. Create one to get started!
                   </div>
                 ) : (
                   plans.map((plan) => (
-                    <article key={plan.id} className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-slate-100">{plan.venue_name}</h3>
-                        <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-cyan-300">
+                    <article key={plan.id} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-semibold text-slate-900">{plan.venue_name}</h3>
+                        <span className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
                           {plan.activity_type}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-slate-400">
-                        {plan.description || "No description yet"}
+                      <p className="mt-2 text-xs text-slate-600">
+                        {new Date(plan.scheduled_at).toLocaleDateString()}
                       </p>
-                      <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                        <span>{new Date(plan.scheduled_at).toLocaleString()}</span>
-                        <span>{plan.spots_filled}/{plan.spots_total} spots filled</span>
-                      </div>
+                      <p className="mt-1 line-clamp-2 text-sm text-slate-600">
+                        {plan.description || "No description"}
+                      </p>
+                      <p className="mt-3 text-xs text-slate-500">
+                        {plan.spots_filled}/{plan.spots_total} spots
+                      </p>
                     </article>
                   ))
                 )}
               </div>
             </div>
-          </section>
-        )}
-      </div>
+          </div>
+        </div>
+      </main>
     </div>
+  );
+}
+
+interface AuthPageProps {
+  authMode: "signup" | "login";
+  setAuthMode: (mode: "signup" | "login") => void;
+  authEmail: string;
+  setAuthEmail: (email: string) => void;
+  authPassword: string;
+  setAuthPassword: (password: string) => void;
+  showPassword: boolean;
+  setShowPassword: (show: boolean) => void;
+  handleAuth: (e: React.FormEvent) => void;
+  authMessage: string | null;
+}
+
+function AuthPage({
+  authMode,
+  setAuthMode,
+  authEmail,
+  setAuthEmail,
+  authPassword,
+  setAuthPassword,
+  showPassword,
+  setShowPassword,
+  handleAuth,
+  authMessage,
+}: AuthPageProps) {
+  const isSignup = authMode === "signup";
+
+  return (
+    <main className="min-h-screen bg-white">
+      <div className="flex min-h-screen flex-col lg:flex-row">
+        {/* Left side - hero/branding */}
+        <section className="relative hidden lg:block lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 p-12">
+          <div className="flex h-full flex-col justify-between">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/20 text-white font-bold text-lg">
+                M
+              </div>
+              <h2 className="mt-12 text-4xl font-bold text-white">
+                Create local plans and meet people nearby.
+              </h2>
+              <p className="mt-4 text-lg text-blue-100">
+                Get matched with people in your area, discover new venues, and create unforgettable memories together.
+              </p>
+            </div>
+
+            <div className="space-y-4 text-blue-100">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                  ✓
+                </div>
+                <span>Join vibrant communities in your city</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                  ✓
+                </div>
+                <span>Find plans tailored to your interests</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                  ✓
+                </div>
+                <span>Connect with people who share your passions</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Right side - form */}
+        <section className="flex w-full flex-1 items-center justify-center px-4 py-12 sm:px-8 lg:w-1/2">
+          <div className="w-full max-w-sm">
+            {/* Mobile brand */}
+            <div className="mb-8 flex items-center gap-2 lg:hidden">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
+                M
+              </div>
+              <span className="text-xl font-bold text-slate-900">MeetMap</span>
+            </div>
+
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-slate-900">
+                {isSignup ? "Join MeetMap" : "Welcome back"}
+              </h1>
+              <p className="mt-2 text-slate-600">
+                {isSignup
+                  ? "Create an account to start planning with people near you."
+                  : "Log in to see your plans and discover new meetups."}
+              </p>
+            </div>
+
+            {/* Mode toggle */}
+            <div className="mb-8 grid grid-cols-2 gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+              <button
+                type="button"
+                onClick={() => setAuthMode("signup")}
+                className={`rounded-md py-2.5 text-sm font-semibold transition-all ${
+                  isSignup
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                Sign up
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthMode("login")}
+                className={`rounded-md py-2.5 text-sm font-semibold transition-all ${
+                  !isSignup
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                Log in
+              </button>
+            </div>
+
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-slate-900">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  required
+                  className={`mt-2 ${inputClass}`}
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="block text-sm font-medium text-slate-900">
+                    Password
+                  </label>
+                  {!isSignup && (
+                    <button
+                      type="button"
+                      className="text-xs font-medium text-blue-600 hover:underline"
+                    >
+                      Forgot?
+                    </button>
+                  )}
+                </div>
+                <div className="relative mt-2">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete={isSignup ? "new-password" : "current-password"}
+                    placeholder={isSignup ? "Create a password" : "Your password"}
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                    required
+                    className={`${inputClass} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff />
+                    ) : (
+                      <Eye />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {isSignup && (
+                <label className="flex items-start gap-2.5 text-sm text-slate-600">
+                  <input
+                    type="checkbox"
+                    required
+                    className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600"
+                  />
+                  <span>
+                    I agree to the{" "}
+                    <a href="#" className="font-medium text-blue-600 hover:underline">
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a href="#" className="font-medium text-blue-600 hover:underline">
+                      Privacy Policy
+                    </a>
+                    .
+                  </span>
+                </label>
+              )}
+
+              {authMessage && (
+                <div className={`rounded-lg p-3 text-sm ${
+                  authMessage.toLowerCase().includes("error") || 
+                  authMessage.toLowerCase().includes("failed") ||
+                  authMessage.toLowerCase().includes("invalid")
+                    ? "bg-red-50 text-red-700"
+                    : "bg-blue-50 text-blue-700"
+                }`}>
+                  {authMessage}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-700"
+              >
+                {isSignup ? "Create account" : "Log in"}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="my-6 flex items-center gap-4">
+              <span className="h-px flex-1 bg-slate-200" />
+              <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                or continue with
+              </span>
+              <span className="h-px flex-1 bg-slate-200" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-900 transition hover:bg-slate-50"
+              >
+                <GoogleIcon />
+                Google
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-900 transition hover:bg-slate-50"
+              >
+                <AppleIcon />
+                Apple
+              </button>
+            </div>
+
+            <p className="mt-8 text-center text-sm text-slate-600">
+              {isSignup ? "Already have an account? " : "New to MeetMap? "}
+              <button
+                type="button"
+                onClick={() => setAuthMode(isSignup ? "login" : "signup")}
+                className="font-semibold text-blue-600 hover:underline"
+              >
+                {isSignup ? "Log in" : "Create account"}
+              </button>
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function Eye() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function EyeOff() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.2 4.2M9.9 5.2A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a17.9 17.9 0 0 1-3.2 4.1M6.1 6.1A17.7 17.7 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 3.4-.6"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="#4285F4"
+        d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.4a5.5 5.5 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.6-5.2 3.6-8.8Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.2 0 6-1.1 8-3l-3.9-3c-1 .7-2.4 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8l4-3.1Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1C6.2 6.8 8.9 4.8 12 4.8Z"
+      />
+    </svg>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M16.4 12.9c0-2.5 2-3.7 2.1-3.8-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9-.7 0-1.9-.9-3.1-.8-1.6 0-3 .9-3.9 2.4-1.6 2.9-.4 7.1 1.2 9.4.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.2 0 2-1.1 2.8-2.2.9-1.3 1.2-2.5 1.3-2.6-.1 0-2.5-1-2.5-3.8ZM14 5.4c.6-.8 1-1.9.9-3-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3Z" />
+    </svg>
   );
 }
